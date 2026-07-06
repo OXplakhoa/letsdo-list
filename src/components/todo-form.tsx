@@ -107,7 +107,7 @@ export function TodoForm({
       <DialogTrigger
         render={trigger || defaultTrigger}
       />
-      <DialogContent className="sm:max-w-[500px] p-0">
+      <DialogContent className="sm:max-w-125 p-0">
         <DialogHeader className="p-6 pb-0">
           <DialogTitle
             className="text-2xl font-bold"
@@ -155,7 +155,7 @@ export function TodoForm({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder={t.descPlaceholder}
-              className="text-base min-h-[80px]"
+              className="text-base min-h-20"
             />
           </div>
 
