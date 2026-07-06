@@ -12,6 +12,8 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 
+import { useLanguage } from '@/lib/i18n/LanguageContext';
+
 interface TodoFormProps {
   onSubmit: (data: { title: string; description?: string; priority?: string }) => Promise<void>;
   initialData?: {
@@ -26,9 +28,9 @@ interface TodoFormProps {
 }
 
 const PRIORITIES = [
-  { value: 'HIGH', label: 'HIGH', color: '#FF69B4' },
-  { value: 'MEDIUM', label: 'MEDIUM', color: '#FF6B35' },
-  { value: 'LOW', label: 'LOW', color: '#FFD700' },
+  { value: 'HIGH', labelKey: 'filterHigh', color: '#FF69B4' },
+  { value: 'MEDIUM', labelKey: 'filterMedium', color: '#FF6B35' },
+  { value: 'LOW', labelKey: 'filterLow', color: '#FFD700' },
 ];
 
 export function TodoForm({
@@ -39,6 +41,7 @@ export function TodoForm({
   open: controlledOpen,
   onOpenChange: controlledOnOpenChange,
 }: TodoFormProps) {
+  const { t } = useLanguage();
   const [internalOpen, setInternalOpen] = useState(false);
   const open = controlledOpen ?? internalOpen;
   const setOpen = controlledOnOpenChange ?? setInternalOpen;
@@ -95,7 +98,7 @@ export function TodoForm({
       className="font-bold text-lg px-6 py-3"
       style={{ backgroundColor: '#4169E1', color: '#FFF' }}
     >
-      + Add Todo
+      {t.addTodo}
     </Button>
   );
 
@@ -110,7 +113,7 @@ export function TodoForm({
             className="text-2xl font-bold"
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
           >
-            {mode === 'create' ? '📝 New Todo' : '✏️ Edit Todo'}
+            {mode === 'create' ? `📝 ${t.newTodo}` : `✏️ ${t.editTodo}`}
           </DialogTitle>
         </DialogHeader>
 
@@ -131,13 +134,13 @@ export function TodoForm({
 
           <div className="space-y-2">
             <label className="font-bold text-sm uppercase tracking-wider">
-              Title *
+              {t.titleLabel}
             </label>
             <Input
               id="todo-title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="What needs to be done?"
+              placeholder={t.titlePlaceholder}
               className="text-base py-3"
               autoFocus
             />
@@ -145,20 +148,20 @@ export function TodoForm({
 
           <div className="space-y-2">
             <label className="font-bold text-sm uppercase tracking-wider">
-              Description
+              {t.descLabel}
             </label>
             <Textarea
               id="todo-description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Add some details (optional)"
+              placeholder={t.descPlaceholder}
               className="text-base min-h-[80px]"
             />
           </div>
 
           <div className="space-y-2">
             <label className="font-bold text-sm uppercase tracking-wider">
-              Priority
+              {t.priorityLabel}
             </label>
             <div className="flex gap-3">
               {PRIORITIES.map((p) => (
@@ -182,7 +185,7 @@ export function TodoForm({
                         : 'none',
                   }}
                 >
-                  {p.label}
+                  {p.value}
                 </button>
               ))}
             </div>
@@ -196,7 +199,7 @@ export function TodoForm({
               className="flex-1 font-bold"
               style={{ backgroundColor: '#FFF' }}
             >
-              Cancel
+              {t.cancel}
             </Button>
             <Button
               type="submit"
@@ -207,8 +210,8 @@ export function TodoForm({
               {isSubmitting
                 ? '...'
                 : mode === 'create'
-                ? '🚀 Create'
-                : '💾 Save'}
+                ? `🚀 ${t.create}`
+                : `💾 ${t.save}`}
             </Button>
           </div>
         </form>

@@ -20,6 +20,8 @@ export const metadata: Metadata = {
     "A bold, feature-rich todo list application built with Next.js, Prisma, and PostgreSQL. Featuring Neubrutalism design, soft deletes, and optimistic updates.",
 };
 
+import { Providers } from "./providers";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -31,7 +33,9 @@ export default function RootLayout({
       className={`${spaceGrotesk.variable} ${geistMono.variable} h-full`}
     >
       <body className="min-h-full flex flex-col" style={{ fontFamily: "'Space Grotesk', 'Inter', sans-serif" }}>
-        {children}
+        <Providers>
+          {children}
+        </Providers>
         <Toaster
           position="bottom-right"
           toastOptions={{

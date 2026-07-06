@@ -7,8 +7,11 @@ import { TodoForm } from '@/components/todo-form';
 import { SearchFilterBar } from '@/components/search-filter-bar';
 import { SortSelect } from '@/components/sort-select';
 import { toast } from 'sonner';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { Language } from '@/lib/i18n/dictionaries';
 
 export default function Home() {
+  const { t, language, setLanguage } = useLanguage();
   const {
     todos,
     total,
@@ -22,6 +25,7 @@ export default function Home() {
     updateTodo,
     toggleTodo,
     deleteTodo,
+    reorderTodos,
   } = useTodos({ initialQuery: { limit: 50 } });
 
   const handleCreate = async (data: {
@@ -30,7 +34,7 @@ export default function Home() {
     priority?: string;
   }) => {
     await createTodo(data);
-    toast.success('Todo created!', {
+    toast.success(t.todoCreated, {
       style: {
         backgroundColor: '#4169E1',
         color: '#FFF',
@@ -43,13 +47,13 @@ export default function Home() {
   const handleDelete = async (id: string) => {
     const result = await deleteTodo(id);
 
-    toast('Todo deleted', {
-      description: 'Click undo to restore it.',
+    toast(t.todoDeleted, {
+      description: t.clickUndo,
       action: {
-        label: 'Undo',
+        label: t.undo,
         onClick: async () => {
           await result.undo();
-          toast.success('Todo restored!', {
+          toast.success(t.todoRestored, {
             style: {
               backgroundColor: '#33CC99',
               color: '#000',
@@ -78,10 +82,27 @@ export default function Home() {
     >
       {/* Header */}
       <header
-        className="border-b-4 border-black"
+        className="border-b-4 border-black relative"
         style={{ backgroundColor: '#4169E1' }}
       >
-        <div className="max-w-4xl mx-auto px-4 py-6">
+        <div className="absolute top-2 right-4 flex gap-2">
+          {(['en', 'vi', 'ja'] as Language[]).map((lang) => (
+            <button
+              key={lang}
+              onClick={() => setLanguage(lang)}
+              className="text-xs font-bold px-2 py-1 uppercase"
+              style={{
+                backgroundColor: language === lang ? '#FFD700' : '#FFF',
+                border: '2px solid #000',
+                boxShadow: language === lang ? '1px 1px 0px #000' : '2px 2px 0px #000',
+                transform: language === lang ? 'translate(1px, 1px)' : 'none',
+              }}
+            >
+              {lang}
+            </button>
+          ))}
+        </div>
+        <div className="max-w-4xl mx-auto px-4 py-8 pt-10">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
               <h1
@@ -91,10 +112,10 @@ export default function Home() {
                   fontFamily: "'Space Grotesk', sans-serif",
                 }}
               >
-                ✅ Let&apos;s Do List
+                ✅ {t.appTitle}
               </h1>
               <p className="text-blue-100 font-medium mt-1">
-                {total} {total === 1 ? 'task' : 'tasks'} total
+                {total} {total === 1 ? t.taskTotal : t.tasksTotal}
               </p>
             </div>
             <TodoForm onSubmit={handleCreate} />
@@ -128,7 +149,7 @@ export default function Home() {
               onSortChange={(sort) => setQuery({ sort })}
             />
             <div className="text-sm font-medium text-gray-600">
-              Showing {todos.length} of {total} todos
+              {t.showing} {todos.length} {t.of} {total} {t.todos}
             </div>
           </div>
         </div>
@@ -140,6 +161,7 @@ export default function Home() {
           onToggle={toggleTodo}
           onUpdate={updateTodo}
           onDelete={handleDelete}
+          onReorder={reorderTodos}
         />
 
         {/* Pagination */}
@@ -211,8 +233,7 @@ export default function Home() {
       <footer className="mt-auto border-t-4 border-black py-4">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <p className="font-bold text-sm text-gray-600">
-            Built with 💛 using Next.js, Prisma & PostgreSQL — Neubrutalism
-            Style
+            {t.footer}
           </p>
         </div>
       </footer>
