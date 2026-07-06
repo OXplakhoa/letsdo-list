@@ -26,7 +26,7 @@ export default function Home() {
     toggleTodo,
     deleteTodo,
     reorderTodos,
-  } = useTodos({ initialQuery: { limit: 50 } });
+  } = useTodos({ initialQuery: { limit: 25 } });
 
   const handleCreate = async (data: {
     title: string;
@@ -112,7 +112,7 @@ export default function Home() {
                   fontFamily: "'Space Grotesk', sans-serif",
                 }}
               >
-                ✅ {t.appTitle}
+                {t.appTitle}
               </h1>
               <p className="text-blue-100 font-medium mt-1">
                 {total} {total === 1 ? t.taskTotal : t.tasksTotal}

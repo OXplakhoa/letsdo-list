@@ -77,7 +77,24 @@ async function main() {
     await prisma.todo.create({ data: todo });
   }
 
-  console.log(`✅ Seeded ${todos.length} todos`);
+  // Generate 60 additional random tasks to test pagination (default limit is 50)
+  const priorities = ['LOW', 'MEDIUM', 'HIGH'] as const;
+  for (let i = 1; i <= 60; i++) {
+    const randomPriority = priorities[Math.floor(Math.random() * priorities.length)];
+    const isCompleted = Math.random() > 0.7; // 30% chance of being completed
+    
+    await prisma.todo.create({
+      data: {
+        title: `Random Generated Task #${i}`,
+        description: `This is dynamically generated description for task ${i} to test out pagination functionality across the UI.`,
+        priority: randomPriority,
+        completed: isCompleted,
+        position: todos.length + i,
+      }
+    });
+  }
+
+  console.log(`✅ Seeded ${todos.length + 60} todos`);
 }
 
 main()
