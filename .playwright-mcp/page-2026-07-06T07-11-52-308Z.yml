@@ -1,0 +1,146 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - heading "Let's Do List" [level=1] [ref=e220]
+          - paragraph [ref=e8]: 9 tasks total
+        - button "+ Add Todo" [ref=e221]
+    - main [ref=e10]:
+      - generic [ref=e11]:
+        - generic [ref=e12]:
+          - generic [ref=e13]:
+            - generic [ref=e14]: 🔍
+            - textbox "Search todos by title..." [ref=e222]
+          - generic [ref=e16]:
+            - button "All" [ref=e223]
+            - button "Active" [ref=e224]
+            - button "Done" [ref=e225]
+        - generic [ref=e20]:
+          - generic [ref=e21]:
+            - generic [ref=e22]: "Sort:"
+            - generic [ref=e23]:
+              - button "🕐 Newest" [ref=e226]
+              - button "📅 Oldest" [ref=e227]
+              - button "⚡ Priority" [ref=e228]
+          - generic [ref=e27]: Showing 9 of 9 todos
+      - generic [ref=e28]:
+        - generic [ref=e229]:
+          - generic [ref=e230]: 🔥 High Priority (2)
+          - generic [ref=e231]:
+            - generic [ref=e243]:
+              - button "Mark as incomplete" [ref=e244] [cursor=pointer]: ✓
+              - generic [ref=e245]:
+                - generic [ref=e246]:
+                  - heading "Design Neubrutalism theme" [level=3] [ref=e247]
+                  - generic [ref=e248]: HIGH
+                - paragraph [ref=e249]: Bold borders, chunky shadows, vivid colors — no rounded corners!
+                - generic [ref=e250]: Jul 6
+              - generic [ref=e251]:
+                - button "✏️" [ref=e252]
+                - button "🗑️" [ref=e253]
+            - generic [ref=e254]:
+              - button "Mark as incomplete" [ref=e255] [cursor=pointer]: ✓
+              - generic [ref=e256]:
+                - generic [ref=e257]:
+                  - heading "Set up project architecture" [level=3] [ref=e258]
+                  - generic [ref=e259]: HIGH
+                - paragraph [ref=e260]: Configure Next.js with App Router, Prisma, and PostgreSQL
+                - generic [ref=e261]: Jul 6
+              - generic [ref=e262]:
+                - button "✏️" [ref=e263]
+                - button "🗑️" [ref=e264]
+        - generic [ref=e265]:
+          - generic [ref=e266]: ⚡ Medium Priority (4)
+          - generic [ref=e267]:
+            - generic [ref=e268]:
+              - button "Mark as complete" [ref=e269] [cursor=pointer]
+              - generic [ref=e270]:
+                - generic [ref=e271]:
+                  - heading "Test from Playwright" [level=3] [ref=e272]
+                  - generic [ref=e273]: MEDIUM
+                - generic [ref=e274]: Jul 6
+              - generic [ref=e275]:
+                - button "✏️" [ref=e276]
+                - button "🗑️" [ref=e277]
+            - generic [ref=e278]:
+              - button "Mark as complete" [ref=e279] [cursor=pointer]
+              - generic [ref=e280]:
+                - generic [ref=e281]:
+                  - heading "Write unit tests" [level=3] [ref=e282]
+                  - generic [ref=e283]: MEDIUM
+                - paragraph [ref=e284]: Vitest tests for service layer — createTodo, softDelete, restore, listTodos, toggleTodo
+                - generic [ref=e285]: Jul 6
+              - generic [ref=e286]:
+                - button "✏️" [ref=e287]
+                - button "🗑️" [ref=e288]
+            - generic [ref=e289]:
+              - button "Mark as complete" [ref=e290] [cursor=pointer]
+              - generic [ref=e291]:
+                - generic [ref=e292]:
+                  - heading "Implement soft delete with undo" [level=3] [ref=e293]
+                  - generic [ref=e294]: MEDIUM
+                - paragraph [ref=e295]: Delete sets deletedAt timestamp, toast shows undo button for 5 seconds
+                - generic [ref=e296]: Jul 6
+              - generic [ref=e297]:
+                - button "✏️" [ref=e298]
+                - button "🗑️" [ref=e299]
+            - generic [ref=e300]:
+              - button "Mark as complete" [ref=e301] [cursor=pointer]
+              - generic [ref=e302]:
+                - generic [ref=e303]:
+                  - heading "Add search and filtering" [level=3] [ref=e304]
+                  - generic [ref=e305]: MEDIUM
+                - paragraph [ref=e306]: Search by title, filter by status (all/active/completed)
+                - generic [ref=e307]: Jul 6
+              - generic [ref=e308]:
+                - button "✏️" [ref=e309]
+                - button "🗑️" [ref=e310]
+        - generic [ref=e311]:
+          - generic [ref=e312]: 🌱 Low Priority (3)
+          - generic [ref=e313]:
+            - generic [ref=e314]:
+              - button "Mark as complete" [ref=e315] [cursor=pointer]
+              - generic [ref=e316]:
+                - generic [ref=e317]:
+                  - heading "Deploy to Vercel" [level=3] [ref=e318]
+                  - generic [ref=e319]: LOW
+                - paragraph [ref=e320]: Connect Neon database, set environment variables, deploy
+                - generic [ref=e321]: Jul 6
+              - generic [ref=e322]:
+                - button "✏️" [ref=e323]
+                - button "🗑️" [ref=e324]
+            - generic [ref=e325]:
+              - button "Mark as complete" [ref=e326] [cursor=pointer]
+              - generic [ref=e327]:
+                - generic [ref=e328]:
+                  - heading "Add drag-and-drop reordering" [level=3] [ref=e329]
+                  - generic [ref=e330]: LOW
+                - paragraph [ref=e331]: "Stretch goal: use dnd-kit to drag todos between priority sections"
+                - generic [ref=e332]: Jul 6
+              - generic [ref=e333]:
+                - button "✏️" [ref=e334]
+                - button "🗑️" [ref=e335]
+            - generic [ref=e336]:
+              - button "Mark as complete" [ref=e337] [cursor=pointer]
+              - generic [ref=e338]:
+                - generic [ref=e339]:
+                  - heading "Write comprehensive README" [level=3] [ref=e340]
+                  - generic [ref=e341]: LOW
+                - paragraph [ref=e342]: Architecture diagram, setup instructions, design decisions, known limitations
+                - generic [ref=e343]: Jul 6
+              - generic [ref=e344]:
+                - button "✏️" [ref=e345]
+                - button "🗑️" [ref=e346]
+    - contentinfo [ref=e32]:
+      - paragraph [ref=e34]: Built with 💛 using Next.js, Prisma & PostgreSQL — Neubrutalism Style
+  - region "Notifications alt+T":
+    - list:
+      - listitem [ref=e354]:
+        - generic [ref=e355]:
+          - generic [ref=e356]: Todo deleted
+          - generic [ref=e357]: Click undo to restore it.
+        - button "Undo" [ref=e358] [cursor=pointer]
+  - button "Open Next.js Dev Tools" [ref=e40] [cursor=pointer]:
+    - img [ref=e41]
+  - alert [ref=e152]

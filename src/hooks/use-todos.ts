@@ -24,6 +24,7 @@ interface UseTodosReturn {
   toggleTodo: (id: string) => Promise<void>;
   deleteTodo: (id: string) => Promise<{ undo: () => Promise<void> }>;
   refreshTodos: () => Promise<void>;
+  reorderTodos: (items: { id: string; priority: 'LOW' | 'MEDIUM' | 'HIGH'; position: number }[]) => Promise<void>;
 }
 
 export function useTodos(options?: UseTodosOptions): UseTodosReturn {
@@ -44,9 +45,11 @@ export function useTodos(options?: UseTodosOptions): UseTodosReturn {
   // Track in-flight requests to ignore stale responses
   const requestIdRef = useRef(0);
 
-  const fetchTodos = useCallback(async (currentQuery: TodosQuery) => {
+  const fetchTodos = useCallback(async (currentQuery: TodosQuery, showLoading = true) => {
     const requestId = ++requestIdRef.current;
-    setIsLoading(true);
+    if (showLoading) {
+      setIsLoading(true);
+    }
     setError(null);
 
     try {
@@ -72,7 +75,7 @@ export function useTodos(options?: UseTodosOptions): UseTodosReturn {
       if (requestId !== requestIdRef.current) return;
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
-      if (requestId === requestIdRef.current) {
+      if (requestId === requestIdRef.current && showLoading) {
         setIsLoading(false);
       }
     }
@@ -80,7 +83,7 @@ export function useTodos(options?: UseTodosOptions): UseTodosReturn {
 
   // Fetch todos whenever query changes
   useEffect(() => {
-    fetchTodos(query);
+    fetchTodos(query, true);
   }, [query, fetchTodos]);
 
   const setQuery = useCallback((partial: Partial<TodosQuery>) => {
@@ -92,8 +95,8 @@ export function useTodos(options?: UseTodosOptions): UseTodosReturn {
     }));
   }, []);
 
-  const refreshTodos = useCallback(async () => {
-    await fetchTodos(query);
+  const refreshTodos = useCallback(async (background = false) => {
+    await fetchTodos(query, !background);
   }, [query, fetchTodos]);
 
   const createTodo = useCallback(
@@ -110,8 +113,8 @@ export function useTodos(options?: UseTodosOptions): UseTodosReturn {
           throw new Error(errorData.error || 'Failed to create todo');
         }
 
-        // Refresh the list after creation
-        await fetchTodos(query);
+        // Refresh the list after creation (background refresh to avoid flash)
+        await fetchTodos(query, false);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to create todo');
         throw err;
@@ -141,7 +144,7 @@ export function useTodos(options?: UseTodosOptions): UseTodosReturn {
         }
 
         // Refresh to get server state
-        await fetchTodos(query);
+        await fetchTodos(query, false);
       } catch (err) {
         // Rollback on error
         setTodos(previousTodos);
@@ -217,7 +220,7 @@ export function useTodos(options?: UseTodosOptions): UseTodosReturn {
             }
 
             // Refresh the list
-            await fetchTodos(query);
+            await fetchTodos(query, false);
           },
         };
       } catch (err) {
@@ -231,6 +234,32 @@ export function useTodos(options?: UseTodosOptions): UseTodosReturn {
       }
     },
     [todos, query, fetchTodos]
+  );
+
+  const reorderTodos = useCallback(
+    async (items: { id: string; priority: 'LOW' | 'MEDIUM' | 'HIGH'; position: number }[]) => {
+      // We don't do full optimistic UI here natively for the entire list across all pages,
+      // but we update the current page's order immediately before firing API.
+      
+      try {
+        const res = await fetch(`${API_BASE}/reorder`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(items),
+        });
+
+        if (!res.ok) {
+          throw new Error('Failed to reorder todos');
+        }
+
+        // Refresh after reorder
+        await fetchTodos(query, false);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to reorder todos');
+        await fetchTodos(query, false); // rollback
+      }
+    },
+    [query, fetchTodos]
   );
 
   return {
@@ -247,5 +276,6 @@ export function useTodos(options?: UseTodosOptions): UseTodosReturn {
     toggleTodo,
     deleteTodo,
     refreshTodos,
+    reorderTodos,
   };
 }

@@ -1,10 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
-import { PriorityBadge } from '@/components/priority-badge';
+import React from 'react';
+import type { Todo } from '@/types/todo';
+import { format } from 'date-fns';
+import { Checkbox } from '@/components/ui/checkbox';
 import { TodoForm } from '@/components/todo-form';
 import { Button } from '@/components/ui/button';
-import type { Todo } from '@/types/todo';
+import { PriorityBadge } from '@/components/priority-badge';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { GripVertical } from 'lucide-react';
 
 interface TodoItemProps {
   todo: Todo;
@@ -13,100 +18,80 @@ interface TodoItemProps {
   onDelete: (id: string) => Promise<{ undo: () => Promise<void> }>;
 }
 
-export function TodoItem({ todo, onToggle, onUpdate, onDelete }: TodoItemProps) {
-  const [isToggling, setIsToggling] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [editOpen, setEditOpen] = useState(false);
+export function TodoItem({
+  todo,
+  onToggle,
+  onUpdate,
+  onDelete,
+}: TodoItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: todo.id });
 
-  const handleToggle = async () => {
-    if (isToggling) return; // Prevent double-click
-    setIsToggling(true);
-    try {
-      await onToggle(todo.id);
-    } finally {
-      setIsToggling(false);
-    }
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 50 : 'auto',
   };
-
-  const handleDelete = async () => {
-    if (isDeleting) return;
-    setIsDeleting(true);
-    try {
-      await onDelete(todo.id);
-    } finally {
-      setIsDeleting(false);
-    }
-  };
-
-  const handleEdit = async (data: { title: string; description?: string; priority?: string }) => {
-    await onUpdate(todo.id, {
-      title: data.title,
-      description: data.description || null,
-      priority: data.priority as Todo['priority'],
-    });
-  };
-
-  const createdDate = new Date(todo.createdAt).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-  });
 
   return (
     <div
-      className={`nb-card p-4 flex items-start gap-4 transition-all ${
-        todo.completed ? 'opacity-60' : ''
+      ref={setNodeRef}
+      style={style}
+      className={`nb-card group p-4 flex items-start gap-4 ${
+        todo.completed ? 'bg-gray-50' : 'bg-white'
       }`}
-      style={{
-        backgroundColor: todo.completed ? '#F0F0F0' : '#FFFFFF',
-      }}
     >
-      {/* Checkbox area */}
-      <button
-        onClick={handleToggle}
-        disabled={isToggling}
-        className="mt-0.5 flex-shrink-0 w-7 h-7 flex items-center justify-center font-bold text-lg"
-        style={{
-          backgroundColor: todo.completed ? '#4169E1' : '#FFFFFF',
-          color: todo.completed ? '#FFFFFF' : 'transparent',
-          border: '3px solid #000',
-          boxShadow: '2px 2px 0px #000',
-          cursor: isToggling ? 'wait' : 'pointer',
-        }}
-        aria-label={todo.completed ? 'Mark as incomplete' : 'Mark as complete'}
+      {/* Drag handle */}
+      <div 
+        {...attributes} 
+        {...listeners} 
+        className="mt-1 cursor-grab active:cursor-grabbing text-gray-400 hover:text-black transition-colors"
       >
-        {todo.completed ? '✓' : ''}
-      </button>
+        <GripVertical size={20} />
+      </div>
 
-      {/* Content area */}
+      <div className="pt-1">
+        <Checkbox
+          checked={todo.completed}
+          onCheckedChange={() => onToggle(todo.id)}
+        />
+      </div>
+      
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-3 flex-wrap">
           <h3
-            className={`font-bold text-base ${
-              todo.completed ? 'line-through' : ''
+            className={`font-bold text-lg truncate ${
+              todo.completed ? 'todo-completed' : ''
             }`}
           >
             {todo.title}
           </h3>
-          <PriorityBadge priority={todo.priority as 'LOW' | 'MEDIUM' | 'HIGH'} size="sm" />
+          <PriorityBadge priority={todo.priority} />
         </div>
-
+        
         {todo.description && (
           <p
             className={`mt-1 text-sm ${
-              todo.completed ? 'line-through text-gray-500' : 'text-gray-700'
+              todo.completed ? 'text-gray-400' : 'text-gray-600'
             }`}
           >
             {todo.description}
           </p>
         )}
-
-        <div className="mt-2 text-xs text-gray-500 font-medium">
-          {createdDate}
+        
+        <div className="mt-2 text-xs font-bold text-gray-400">
+          {format(new Date(todo.createdAt), 'MMM d, yyyy h:mm a')}
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="flex gap-2 flex-shrink-0">
+      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
         <TodoForm
           mode="edit"
           initialData={{
@@ -114,14 +99,14 @@ export function TodoItem({ todo, onToggle, onUpdate, onDelete }: TodoItemProps) 
             description: todo.description,
             priority: todo.priority,
           }}
-          onSubmit={handleEdit}
-          open={editOpen}
-          onOpenChange={setEditOpen}
+          onSubmit={(data) => onUpdate(todo.id, data as Partial<Todo>)}
           trigger={
             <Button
               variant="outline"
-              className="px-3 py-1 text-sm font-bold"
-              style={{ backgroundColor: '#FFD700' }}
+              size="icon-sm"
+              className="font-bold text-xl hover:bg-yellow-200"
+              style={{ backgroundColor: '#FFF' }}
+              title="Edit"
             >
               ✏️
             </Button>
@@ -129,12 +114,13 @@ export function TodoItem({ todo, onToggle, onUpdate, onDelete }: TodoItemProps) 
         />
         <Button
           variant="outline"
-          onClick={handleDelete}
-          disabled={isDeleting}
-          className="px-3 py-1 text-sm font-bold"
-          style={{ backgroundColor: '#FF4444', color: '#FFF' }}
+          size="icon-sm"
+          className="font-bold text-xl hover:bg-red-200"
+          style={{ backgroundColor: '#FFF' }}
+          onClick={() => onDelete(todo.id)}
+          title="Delete"
         >
-          {isDeleting ? '...' : '🗑️'}
+          🗑️
         </Button>
       </div>
     </div>

@@ -42,14 +42,12 @@ export async function listTodos(query: GetTodosQuery) {
       orderBy = [{ createdAt: 'asc' }];
       break;
     case 'priority':
-      // Prisma doesn't natively sort enums by custom order,
-      // so we sort by priority field (alphabetical works for enum names: HIGH < LOW < MEDIUM isn't ideal)
-      // Instead, we'll use raw ordering. For now use createdAt as secondary.
-      orderBy = [{ priority: 'asc' }, { createdAt: 'desc' }];
+      orderBy = [{ priority: 'asc' }, { position: 'asc' }, { createdAt: 'desc' }];
       break;
     case 'newest':
     default:
-      orderBy = [{ createdAt: 'desc' }];
+      // Always sort by position first for newest/default so drag and drop works
+      orderBy = [{ position: 'asc' }, { createdAt: 'desc' }];
       break;
   }
 
@@ -68,7 +66,7 @@ export async function listTodos(query: GetTodosQuery) {
     data.sort((a, b) => {
       const diff = PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority];
       if (diff !== 0) return diff;
-      return b.createdAt.getTime() - a.createdAt.getTime();
+      return (a.position ?? 0) - (b.position ?? 0);
     });
   }
 
@@ -94,13 +92,13 @@ export async function getTodoById(id: string) {
 }
 
 export async function createTodo(input: CreateTodoInput) {
-  // Assign position as max(position) + 1 for ordering
-  const maxPosition = await prisma.todo.aggregate({
-    _max: { position: true },
+  // Assign position as min(position) - 1 so newest items appear at the top
+  const minPosition = await prisma.todo.aggregate({
+    _min: { position: true },
     where: { deletedAt: null },
   });
 
-  const position = (maxPosition._max.position ?? -1) + 1;
+  const position = (minPosition._min.position ?? 0) - 1;
 
   return prisma.todo.create({
     data: {
