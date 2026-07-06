@@ -112,6 +112,7 @@ button, .nb-btn {
   box-shadow: 4px 4px 0px #000;
   transition: transform 0.1s, box-shadow 0.1s;
   border-radius: 0px !important;
+  cursor: pointer;
 }
 
 button:hover, .nb-btn:hover {
