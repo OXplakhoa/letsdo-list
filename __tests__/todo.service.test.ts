@@ -27,8 +27,8 @@ describe('TodoService', () => {
       title: 'Test Todo',
     };
 
-    const mockMaxPosition = { _max: { position: null } };
-    vi.mocked(prisma.todo.aggregate).mockResolvedValue(mockMaxPosition as any);
+    const mockMinPosition = { _min: { position: 0 } };
+    vi.mocked(prisma.todo.aggregate).mockResolvedValue(mockMinPosition as any);
     
     const mockCreated = {
       id: '1',
@@ -36,7 +36,7 @@ describe('TodoService', () => {
       description: null,
       completed: false,
       priority: 'MEDIUM' as const,
-      position: 0,
+      position: -1,
       createdAt: new Date(),
       updatedAt: new Date(),
       deletedAt: null,
@@ -46,7 +46,7 @@ describe('TodoService', () => {
     const result = await todoService.createTodo(input);
 
     expect(prisma.todo.aggregate).toHaveBeenCalledWith({
-      _max: { position: true },
+      _min: { position: true },
       where: { deletedAt: null },
     });
     
@@ -55,7 +55,7 @@ describe('TodoService', () => {
         title: 'Test Todo',
         description: null,
         priority: 'MEDIUM',
-        position: 0,
+        position: -1,
       },
     });
     

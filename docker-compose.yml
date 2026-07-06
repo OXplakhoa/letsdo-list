@@ -15,5 +15,18 @@ services:
       timeout: 5s
       retries: 5
 
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      # Connects to the 'db' service defined above
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/todolist?schema=public
+    depends_on:
+      db:
+        condition: service_healthy
+
 volumes:
   postgres_data:

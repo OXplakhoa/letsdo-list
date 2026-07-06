@@ -125,6 +125,5 @@ npm run test
 
 ## 🛠️ Trade-offs & Future Improvements
 
-- **Drag-and-Drop:** Add `dnd-kit` to visually drag items between priority sections and save the new `position` / `priority` to the database.
 - **E2E Testing:** Add Playwright to run full browser-based end-to-end tests for the optimistic UI interactions.
 - **Authentication:** Integrate NextAuth to support multiple users with private lists.
