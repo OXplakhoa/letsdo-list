@@ -1,129 +1,72 @@
 # 📋 Let's Do List
 
-A bold, feature-rich todo list application built with **Next.js**, **Prisma**, and **PostgreSQL**. Featuring a distinctive **Neubrutalism** design, soft deletes, and optimistic UI updates.
+A bold, feature-rich todo list application built with **Next.js**, **Prisma**, and **PostgreSQL**. Featuring a distinctive **Neubrutalism** design, drag-and-drop reordering, soft deletes, and optimistic UI updates.
+
+**Live Demo:** [https://letsdo-list.vercel.app](https://letsdo-list.vercel.app)
+
+---
 
 ## 🚀 Overview
 
-This is a modern full-stack web application designed for a take-home test. It implements a fully functional layered REST API backing a React frontend, styled with a distinct, vivid Neubrutalism visual language.
+This is a modern full-stack web application. It implements a fully functional layered REST API backing a React frontend, styled with a distinct, vivid Neubrutalism visual language. 
+
+### Key Features
+- **Full CRUD & Soft Deletes:** Create, read, update, and delete tasks. Deleted tasks can be restored via an "Undo" toast.
+- **Drag & Drop:** Visually reorder tasks; order persists securely in the database.
+- **Search & Filters:** Real-time text search, priority grouping (High/Medium/Low), and completion status filtering.
+- **Internationalization (i18n):** Instantly switch between English (EN), Vietnamese (VI), and Japanese (JA).
+- **Optimistic UI:** Instant visual feedback without waiting for network requests to finish.
 
 ### Tech Stack
 - **Framework:** Next.js (App Router)
-- **Database:** PostgreSQL
+- **Database:** PostgreSQL (Neon Serverless in Prod, Docker locally)
 - **ORM:** Prisma
-- **Validation:** Zod
-- **UI Components:** shadcn/ui
+- **UI Components:** shadcn/ui & dnd-kit
 - **Styling:** TailwindCSS + Custom Neubrutalism overrides
-- **Testing:** Vitest
-- **Deployment:** Docker Compose
 
 ---
 
-## 🎨 Design: Neubrutalism
+## 💻 Getting Started
 
-The UI steps away from the typical clean corporate look and embraces **Neubrutalism**:
-- Sharp corners (`border-radius: 0px`)
-- Thicc, bold black borders
-- Chunky, un-blurred offset shadows
-- Flat, highly saturated colors (Yellow, Orange, Pink, Blue)
-- Dynamic hover and active click states that make the UI feel tactile
-
----
-
-## 📐 Architecture
-
-The application follows a **Layered Architecture** with SOLID principles in mind:
-
-```text
-┌──────────────────────────────────────────────────────┐
-│  CLIENT (React Components)                           │
-│  └── Custom Hook: useTodos() [useState + fetch]      │
-│      └── Optimistic updates + rollback               │
-├──────────────────────────────────────────────────────┤
-│  API ROUTES (Controllers) — /src/app/api/todos/      │
-│  └── Middleware wrapper: Zod validation & errors     │
-├──────────────────────────────────────────────────────┤
-│  SERVICE LAYER — /src/lib/services/todo.service.ts   │
-│  └── Business logic (CRUD, filters, soft delete)     │
-├──────────────────────────────────────────────────────┤
-│  DATA LAYER — Prisma Client                          │
-│  └── PostgreSQL                                      │
-└──────────────────────────────────────────────────────┘
-```
-
-**Why this architecture?**
-- **Separation of concerns:** Each layer has a single responsibility.
-- **Dependency Inversion:** Services are agnostic to HTTP (Next.js request objects); they only take validated data.
-- **Testability:** The service layer can be fully unit-tested independently of the API boundaries.
-
----
-
-## 🚀 Getting Started
+You can run this project locally using either **Docker** (easiest) or a standard Node.js development environment.
 
 ### Option A: Docker Compose (Recommended)
 
-Requires Docker Desktop installed.
+Requires [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed.
 
 ```bash
-git clone <repo>
+git clone https://github.com/OXplakhoa/letsdo-list.git
 cd letsdo-list
-docker compose up --build
+
+# Build and start the containers in the background
+docker compose up --build -d
 ```
-> The app will run at http://localhost:3000
+> The app will run at **http://localhost:3000** with a fresh PostgreSQL database automatically connected and migrated.
 
 ### Option B: Local Development
 
-Requires Node.js 20+ and a PostgreSQL database.
+Requires Node.js 20+ and your own running PostgreSQL database.
 
 ```bash
-git clone <repo>
+git clone https://github.com/OXplakhoa/letsdo-list.git
 cd letsdo-list
+
+# Install dependencies
 npm install
 
-# Set up your .env file with DATABASE_URL
-echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/todolist?schema=public" > .env
+# Set up your environment variable
+echo "DATABASE_URL=postgresql://user:password@localhost:5432/todolist?schema=public" > .env
 
-# Run database migrations and generate client
+# Run database migrations
 npx prisma migrate dev --name init
+
+# Generate Prisma Client
 npx prisma generate
 
-# (Optional) Seed the database
+# (Optional) Seed the database with sample tasks
 npx prisma db seed
 
 # Run the development server
 npm run dev
 ```
-
----
-
-## 🧪 Testing
-
-Unit tests run against the service layer utilizing **Vitest** and mock the Prisma client.
-
-```bash
-npm run test
-```
-
----
-
-## 🧠 Key Design Decisions & Problem-Solving
-
-- **REST API over Server Actions:** Chosen to demonstrate classic backend separation and allow for middleware (validation wrapper) and clean error handling. Docker-friendly and language-agnostic at the API layer.
-- **Soft Delete over Hard Delete:** Records are flagged with a `deletedAt` timestamp instead of being destroyed. This enables the elegant "Undo" feature when a user accidentally deletes a task.
-- **Neubrutalism Identity:** Chosen to create a standout, memorable aesthetic that differentiates this submission from the standard template look.
-- **`useState` + `fetch` for Data Fetching:** Purposefully built a custom `useTodos` hook instead of relying on SWR or React Query to explicitly demonstrate knowledge of state synchronization, optimistic UI updates, error rollbacks, and race-condition mitigation (ignoring stale responses).
-- **Application-Managed `position`:** The DB `position` field relies on an application-level calculation (`max(position) + 1`) rather than auto-increment. Auto-increment cannot be updated after insertion, and application-managed positions are essential for future drag-and-drop support.
-
----
-
-## ⚠️ Known Limitations & Edge Cases
-
-- **Filter vs. Optimistic Rollback:** If a user edits a todo that removes it from the current filter view (e.g., changing status to "Completed" while viewing "Active"), and the API fails, the rollback happens in state, but the UI might temporarily misrepresent it due to the filter logic.
-- **No Auth / Single Player:** Currently a single global shared list without user authentication.
-- **List Reordering:** The database supports `position` sorting, but UI drag-and-drop functionality (using `dnd-kit`) was omitted for time constraints.
-
----
-
-## 🛠️ Trade-offs & Future Improvements
-
-- **E2E Testing:** Add Playwright to run full browser-based end-to-end tests for the optimistic UI interactions.
-- **Authentication:** Integrate NextAuth to support multiple users with private lists.
+> The app will run at **http://localhost:3000**
