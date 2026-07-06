@@ -13,6 +13,7 @@ COPY package.json package-lock.json ./
 RUN npm install
 COPY . .
 RUN npx prisma generate
+ENV BUILD_STANDALONE=true
 RUN npm run build
 
 FROM base AS runner
